@@ -1,0 +1,11 @@
+kind: MethodDelegate
+returnVar: RESULT
+method: put
+path: {{ path }}
+transactional: false
+pipe: 
+  - module: @chillapi/builtin/stub/StubDelegate
+    delegateClass: StubDelegate
+    payload: {{ payload }}
+    reflect: true
+    assign: RESULT
