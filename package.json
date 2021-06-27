@@ -1,6 +1,6 @@
 {
   "name": "@chillapi/stub",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "ChillAPI Stub delegate implementation",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/chillapi/stub#readme",
   "dependencies": {
-    "@chillapi/api": "^1.0.19",
+    "@chillapi/api": "^1.0.20",
     "@chillapi/template": "^1.0.0",
     "handlebars": "^4.7.7",
     "faker": "^5.5.3"
