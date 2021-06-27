@@ -6,6 +6,12 @@ import { ModuleConfig, ModuleLoader } from "@chillapi/api";
 import { OpenAPIV3 } from '@chillapi/api/dist/openapiv3';
 import { executeTemplateIfTargetNotEditedByUser } from '@chillapi/template';
 import { fake } from 'faker';
+import Handlebars from 'handlebars';
+
+global.Handlebars = Handlebars;
+
+import './templates/precompiled';
+
 
 export class StubModuleLoader implements ModuleLoader {
 
