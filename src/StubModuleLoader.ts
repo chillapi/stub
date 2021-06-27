@@ -2,7 +2,8 @@
 import { resolve } from 'path';
 import { loadEntities, Entity } from '@chillapi/api';
 
-import { ModuleConfig, ModuleLoader, OpenAPIV3 } from "@chillapi/api";
+import { ModuleConfig, ModuleLoader } from "@chillapi/api";
+import { OpenAPIV3 } from '@chillapi/api/dist/openapiv3';
 import { executeTemplateIfTargetNotEditedByUser } from '@chillapi/template';
 import { fake } from 'faker';
 
