@@ -1,11 +1,10 @@
 
-import { dirname, resolve } from 'path';
+import { resolve } from 'path';
 import { loadEntities, Entity } from '@chillapi/api';
 
 import { ModuleConfig, ModuleLoader, OpenAPIV3 } from "@chillapi/api";
-import { existsSync } from 'fs';
-import { mkdir, writeFile } from 'fs/promises';
-import Handlebars from 'handlebars';
+import { executeTemplateIfTargetNotEditedByUser } from '@chillapi/template';
+import { fake } from 'faker';
 
 export class StubModuleLoader implements ModuleLoader {
 
@@ -24,7 +23,7 @@ export class StubModuleLoader implements ModuleLoader {
                     schema.$ref === `#/components/schemas/${e.name}`
                     || (isArray && schema.items.$ref === `#/components/schemas/${e.name}`))[0]
                 try {
-                    await this.executeTemplate(fullPath, this.selectTemplate(method, isArray), { path: apiPath, payload: this.generateStub(entity, isArray) });
+                    await executeTemplateIfTargetNotEditedByUser(fullPath, this.selectTemplate(method, isArray), { path: apiPath, payload: this.generateStub(entity, isArray) });
                 } catch (err) {
                     return Promise.reject(err);
                 }
@@ -72,26 +71,7 @@ export class StubModuleLoader implements ModuleLoader {
                 // TODO refine based on format and guess
             }
         }
-        return retObj;
+        return JSON.parse(fake(JSON.stringify(retObj)));
     }
 
-    private async executeTemplate(fPath: string, fTpl: string, args: any): Promise<void> {
-        const dir = dirname(fPath);
-        if (!existsSync(dir)) {
-            try {
-                await mkdir(dir, { recursive: true });
-            } catch (err) {
-                console.error(err);
-                return Promise.reject(err);
-            }
-        }
-        const f = Handlebars.templates[fTpl];
-        try {
-            await writeFile(fPath, f(args), 'utf-8');
-        } catch (err) {
-            console.error(err);
-            return Promise.reject(err);
-        }
-        return Promise.resolve();
-    }
 }

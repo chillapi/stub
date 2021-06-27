@@ -4,7 +4,7 @@ method: delete
 path: {{ path }}
 transactional: false
 pipe: 
-  - module: @chillapi/builtin/stub/StubDelegate
+  - module: @chillapi/stub
     delegateClass: StubDelegate
     payload: {}
     assign: RESULT
