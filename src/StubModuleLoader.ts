@@ -17,7 +17,8 @@ export class StubModuleLoader implements ModuleLoader {
         const entities = loadEntities(api);
         for (const [apiPath, methods] of Object.entries(api.paths)) {
             for (const [method, props] of Object.entries(methods)) {
-                const schema = (props as any).responses[200].content['application/json'].schema;
+                // TODO refine
+                const schema = (props as any).responses['200'].content['application/json'].schema;
                 const fullPath = resolve(fsPath, ...apiPath.replace(/[\{\}]/g, '_').split('/'), `${method}.yaml`);
                 const isArray = schema.type === 'array';
                 const entity = entities.filter(e =>
