@@ -4,7 +4,7 @@ method: get
 path: {{ path }}
 transactional: false
 pipe: 
-  - module: @chillapi/stub
+  - module: '@chillapi/stub'
     delegateClass: StubDelegate
     payload: {{ payload }}
     assign: RESULT

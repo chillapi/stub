@@ -35,7 +35,11 @@ export class StubModuleLoader implements ModuleLoader {
                     schema.$ref === `#/components/schemas/${e.name}`
                     || (isArray && schema.items.$ref === `#/components/schemas/${e.name}`))[0]
                 try {
-                    await executeTemplateIfTargetNotEditedByUser(fullPath, this.selectTemplate(method, isArray), { path: apiPath, payload: this.generateStub(entity, isArray) });
+                    await executeTemplateIfTargetNotEditedByUser(
+                        fullPath,
+                        this.selectTemplate(method, isArray),
+                        { path: apiPath, payload: JSON.stringify(this.generateStub(entity, isArray)) }
+                    );
                 } catch (err) {
                     return Promise.reject(err);
                 }
