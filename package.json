@@ -1,14 +1,16 @@
 {
   "name": "@chillapi/stub",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ChillAPI Stub delegate implementation",
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "prebuild": "rimraf dist/*",
+    "build": "handlebars src/templates -f src/templates/precompiled.js && npm run lint && npm run tsc",
+    "postbuild": "copyfiles -u 1 \"src/**/*\" -e \"**/*.ts\" -e \"**/*.handlebars\" dist",
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
-    "tsc": "tsc",
-    "build": "npm run lint && npm run tsc"
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
@@ -46,6 +48,7 @@
     "typescript": "^4.0.5",
     "jest": "^27.0.5",
     "ts-jest":"^27.0.3",
-    "rimraf":"^3.0.2"
+    "rimraf":"^3.0.2",
+    "copyfiles": "^2.4.1"
   }
 }
