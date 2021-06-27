@@ -18,6 +18,10 @@ export class StubModuleLoader implements ModuleLoader {
         for (const [apiPath, methods] of Object.entries(api.paths)) {
             for (const [method, props] of Object.entries(methods)) {
                 // TODO refine
+                const responses = (props as any).responses;
+                if (!responses || !responses[200] || !responses[200].content) {
+                    continue;
+                }
                 const schema = (props as any).responses['200'].content['application/json'].schema;
                 const fullPath = resolve(fsPath, ...apiPath.replace(/[\{\}]/g, '_').split('/'), `${method}.yaml`);
                 const isArray = schema.type === 'array';
