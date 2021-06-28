@@ -14,22 +14,26 @@ export async function generateStubs(api: OpenAPIV3, fsPath: string): Promise<voi
     const entities = loadEntities(api);
     for (const [apiPath, methods] of Object.entries(api.paths)) {
         for (const [method, props] of Object.entries(methods)) {
+            const fullPath = resolve(fsPath, ...apiPath.replace(/[\{\}]/g, '_').split('/'), `${method}.yaml`);
+            let payload = '';
+            let isArray = false;
+
             // TODO refine
             const responses = (props as any).responses;
-            if (!responses || !responses[200] || !responses[200].content) {
-                continue;
+            if (!!responses && !!responses[200] && !!responses[200].content && !!responses[200].content['application/json'] && !!responses[200].content['application/json'].schema) {
+                const schema = (props as any).responses['200'].content['application/json'].schema;
+                isArray = schema.type === 'array';
+                const entity = entities.filter(e =>
+                    schema.$ref === `#/components/schemas/${e.name}`
+                    || (isArray && schema.items.$ref === `#/components/schemas/${e.name}`))[0];
+                payload = JSON.stringify(generateStub(entity, isArray));
             }
-            const schema = (props as any).responses['200'].content['application/json'].schema;
-            const fullPath = resolve(fsPath, ...apiPath.replace(/[\{\}]/g, '_').split('/'), `${method}.yaml`);
-            const isArray = schema.type === 'array';
-            const entity = entities.filter(e =>
-                schema.$ref === `#/components/schemas/${e.name}`
-                || (isArray && schema.items.$ref === `#/components/schemas/${e.name}`))[0]
+
             try {
                 await executeTemplateIfTargetNotEditedByUser(
                     fullPath,
                     selectTemplate(method, isArray),
-                    { path: apiPath, payload: JSON.stringify(generateStub(entity, isArray)) }
+                    { path: apiPath, payload }
                 );
                 console.info(`Wrote ${fullPath}`);
             } catch (err) {
