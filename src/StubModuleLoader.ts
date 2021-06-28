@@ -31,6 +31,7 @@ export async function generateStubs(api: OpenAPIV3, fsPath: string): Promise<voi
                     selectTemplate(method, isArray),
                     { path: apiPath, payload: JSON.stringify(generateStub(entity, isArray)) }
                 );
+                console.info(`Wrote ${fullPath}`);
             } catch (err) {
                 return Promise.reject(err);
             }
