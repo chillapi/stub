@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/chillapi/stub#readme",
   "dependencies": {
-    "@chillapi/api": "^1.0.22",
+    "@chillapi/api": "^1.0.25",
     "@chillapi/template": "^1.0.3",
     "handlebars": "^4.7.7",
     "faker": "^5.5.3"

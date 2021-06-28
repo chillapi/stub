@@ -1,9 +1,9 @@
 import { resolve } from 'path';
-import { loadEntities, Entity } from '@chillapi/api';
+import { loadEntities, Entity, Property } from '@chillapi/api';
 
 import { OpenAPIV3 } from '@chillapi/api/dist/openapiv3';
 import { executeTemplateIfTargetNotEditedByUser } from '@chillapi/template';
-import { fake } from 'faker';
+import { datatype, lorem, name, date } from 'faker';
 import Handlebars from 'handlebars';
 
 global.Handlebars = Handlebars;
@@ -69,16 +69,39 @@ function generateStub(entity: Entity, isArray: boolean): any {
 
     const retObj: any = {};
     for (const prop of entity.properties) {
-        switch (prop.type) {
-            case 'string':
-                retObj[prop.name] = '{{random.word}}';
-                break;
-            case 'integer':
-                retObj[prop.name] = '{{random.number}}';
-                break;
-            // TODO refine based on format and guess
-        }
-        retObj[prop.name] = fake(retObj[prop.name]);
+        retObj[prop.name] = fakers.find(f => f.match(prop)).generate(prop);
     }
     return retObj;
 }
+
+interface FakerMapping {
+    match: (prop: Property) => boolean;
+    generate: (prop: Property) => string;
+}
+
+const fakers: FakerMapping[] = [
+    {
+        match: p => p.type === 'integer',
+        generate: () => `${datatype.number()}`
+    },
+    {
+        match: p => p.type === 'string' && /.*[iI]d$/.test(p.name),
+        generate: () => `${datatype.uuid()}`
+    },
+    {
+        match: p => p.type === 'integer' && /.*[iI]d$/.test(p.name),
+        generate: () => `${datatype.number()}`
+    },
+    {
+        match: p => p.type === 'string' && /.*[nN]ame$/.test(p.name),
+        generate: () => `${name.firstName()}`
+    },
+    {
+        match: p => p.type === 'string:date',
+        generate: () => `${date.future()}`
+    },
+    {
+        match: () => true,
+        generate: () => `${lorem.word()}`
+    }
+];
