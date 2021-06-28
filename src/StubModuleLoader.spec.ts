@@ -1,11 +1,6 @@
 import { OpenAPIV3 } from '@chillapi/api/dist/openapiv3';
 import { generateStubs } from './StubModuleLoader';
 import { resolve } from 'path';
-import Handlebars from 'handlebars';
-
-global.Handlebars = Handlebars;
-
-import './templates/precompiled';
 
 const api: OpenAPIV3 = {
     "openapi": "3.0.1",
