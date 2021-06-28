@@ -6,6 +6,7 @@ transactional: false
 pipe: 
   - module: '@chillapi/stub'
     delegateClass: StubDelegate
-    payload: {{ payload }}
+    payload: >-
+      {{ payload }}
     reflect: true
     assign: RESULT
