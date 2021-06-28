@@ -41,17 +41,7 @@ export async function generateStubs(api: OpenAPIV3, fsPath: string): Promise<voi
 }
 
 function selectTemplate(method: string, isArray: boolean) {
-    switch (method.toLowerCase()) {
-        case 'get':
-            return isArray ? 'get-entity-list.yaml' : 'get-entity-single.yaml';
-        case 'post':
-            return 'add-entity.yaml';
-        case 'put':
-            return 'update-entity.yaml';
-        case 'delete':
-            return 'delete-entity.yaml';
-        // TODO find a more elegant way to select template
-    }
+    return templates.find(tpl => tpl.match(method, isArray)).template;
 }
 
 function generateStub(entity: Entity, isArray: boolean): any {
@@ -105,3 +95,16 @@ const fakers: FakerMapping[] = [
         generate: () => `${lorem.word()}`
     }
 ];
+
+interface TemplateSelector {
+    template: string;
+    match(method: string, isArray: boolean): boolean;
+}
+
+const templates: TemplateSelector[] = [
+    { template: 'get-entity-list.yaml', match: (method, isArray) => method.toLowerCase() === 'get' && isArray },
+    { template: 'get-entity-single.yaml', match: (method, isArray) => method.toLowerCase() === 'get' && !isArray },
+    { template: 'add-entity.yaml', match: (method) => method.toLowerCase() === 'post' },
+    { template: 'update-entity.yaml', match: (method) => method.toLowerCase() === 'put' },
+    { template: 'delete-entity.yaml', match: (method) => method.toLowerCase() === 'delete' }
+]
