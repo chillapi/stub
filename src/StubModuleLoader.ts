@@ -1,8 +1,7 @@
 import { resolve } from 'path';
-import { loadEntities, Entity, Property } from '@chillapi/api';
+import { loadEntities, Entity, Property, executeTemplateIfTargetNotEditedByUser } from '@chillapi/api';
 
 import { OpenAPIV3 } from '@chillapi/api/dist/openapiv3';
-import { executeTemplateIfTargetNotEditedByUser } from '@chillapi/template';
 import { datatype, lorem, name, date } from 'faker';
 import Handlebars from 'handlebars';
 
@@ -10,11 +9,11 @@ global.Handlebars = Handlebars;
 
 import './templates/precompiled';
 
-export async function generateStubs(api: OpenAPIV3, fsPath: string): Promise<void> {
+export async function generateStubs(api: OpenAPIV3, fsPath: string, locks: { [key: string]: string }): Promise<void> {
     const entities = loadEntities(api);
     for (const [apiPath, methods] of Object.entries(api.paths)) {
         for (const [method, props] of Object.entries(methods)) {
-            const fullPath = resolve(fsPath, ...apiPath.replace(/[\{\}]/g, '_').split('/'), `${method}.yaml`);
+            const fullPath = resolve(fsPath, apiPath.replace(/[\{\}]/g, '').replace(/^\//g, '').replace('/', '-'), `${method}.yaml`);
             let payload = '';
             let isArray = false;
 
@@ -30,11 +29,15 @@ export async function generateStubs(api: OpenAPIV3, fsPath: string): Promise<voi
             }
 
             try {
-                await executeTemplateIfTargetNotEditedByUser(
+                const hash = await executeTemplateIfTargetNotEditedByUser(
                     fullPath,
                     selectTemplate(method, isArray),
-                    { path: apiPath, payload }
+                    { path: apiPath, payload },
+                    locks[fullPath]
                 );
+                if (!!hash) {
+                    locks[fullPath] = hash;
+                }
                 console.info(`Wrote ${fullPath}`);
             } catch (err) {
                 return Promise.reject(err);

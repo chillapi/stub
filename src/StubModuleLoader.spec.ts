@@ -183,16 +183,20 @@ const api: OpenAPIV3 = {
 
 const mockTpl = jest.fn();
 
-jest.mock('@chillapi/template', () => {
-    return { executeTemplateIfTargetNotEditedByUser: (fPath: string, tpl: string, args: any) => mockTpl(fPath, tpl, args) }
+jest.mock('@chillapi/api', () => {
+    const original = jest.requireActual('@chillapi/api');
+    return {
+        ...original,
+        executeTemplateIfTargetNotEditedByUser: (fPath: string, tpl: string, args: any, hash: string) => mockTpl(fPath, tpl, args, hash)
+    }
 });
 
 test('generates stubs', async () => {
     mockTpl.mockClear();
-    await generateStubs(api, "a/path/");
+    await generateStubs(api, "a/path/", {});
     expect(mockTpl.mock.calls).toEqual([
-        [resolve('a/path/', 'pet', 'put.yaml'), 'update-entity.yaml', { path: '/pet', payload: '' }],
-        [resolve('a/path/', 'pet', 'post.yaml'), 'add-entity.yaml', { path: '/pet', payload: '' }],
-        [resolve('a/path/', 'pet/findByStatus', 'get.yaml'), 'get-entity-list.yaml', expect.anything()]
+        [resolve('a/path/', 'pet', 'put.yaml'), 'update-entity.yaml', { path: '/pet', payload: '' }, undefined],
+        [resolve('a/path/', 'pet', 'post.yaml'), 'add-entity.yaml', { path: '/pet', payload: '' }, undefined],
+        [resolve('a/path/', 'pet-findByStatus', 'get.yaml'), 'get-entity-list.yaml', expect.anything(), undefined]
     ]);
 });
